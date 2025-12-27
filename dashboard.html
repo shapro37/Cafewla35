@@ -1,137 +1,128 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <title>لوحة الموظف - الولاء</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>لوحة الموظف الولاء</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #2b1d14;
-            color: #f5e9dc;
-            margin: 0;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #e6c89a;
-        }
-
-        .box {
-            background-color: #3a261a;
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 400px;
-            margin: auto;
-        }
-
-        input, button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border-radius: 8px;
-            border: none;
-            font-size: 16px;
-        }
-
-        input {
-            background-color: #f5e9dc;
-        }
-
-        button {
-            background-color: #8b5e34;
-            color: white;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #a06a3b;
-        }
-
-        .visits {
-            margin-top: 15px;
-            text-align: center;
-            font-size: 18px;
-        }
-
-        .reward {
-            margin-top: 15px;
-            background-color: #e6c89a;
-            color: #2b1d14;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            display: none;
-        }
-    </style>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#2b1d14;
+    color:#f5e9dc;
+    padding:20px;
+}
+h1{
+    text-align:center;
+    color:#e6c89a;
+}
+.box{
+    background:#3a261a;
+    padding:20px;
+    border-radius:12px;
+    max-width:400px;
+    margin:auto;
+}
+input,button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border-radius:8px;
+    border:none;
+    font-size:16px;
+}
+input{
+    background:#f5e9dc;
+}
+button{
+    background:#8b5e34;
+    color:white;
+    cursor:pointer;
+}
+button:hover{
+    background:#a06a3b;
+}
+.visits{
+    margin-top:15px;
+    text-align:center;
+    font-size:18px;
+}
+.reward{
+    margin-top:15px;
+    background:#e6c89a;
+    color:#2b1d14;
+    padding:10px;
+    border-radius:8px;
+    text-align:center;
+    display:none;
+}
+</style>
 </head>
 
 <body>
 
 <script>
-/* ===== كلمة سر لوحة الموظف ===== */
-const PASSWORD = "jazal2025"; // ← غيّر كلمة السر هنا
+/* ===== بيانات الموظفين ===== */
+const USERS = [
+  { username: "admin", password: "mybesns" },
+  { username: "cofe", password: "jazal2025" }
+];
 
-const entered = prompt("أدخل كلمة مرور الموظف:");
+const user = prompt("اسم المستخدم:");
+const pass = prompt("كلمة المرور:");
 
-if (entered !== PASSWORD) {
-    alert("كلمة المرور غير صحيحة");
+const valid = USERS.find(u => u.username === user && u.password === pass);
+
+if(!valid){
+    alert("بيانات الدخول غير صحيحة");
     window.location.href = "index.html";
 }
 </script>
 
-<h1>☕ لوحة الموظف – الولاء</h1>
+<h1> لوحة الموظف – الولاء</h1>
 
 <div class="box">
     <input type="text" id="phone" placeholder="رقم جوال العميل">
     <button onclick="addVisit()">إضافة زيارة</button>
 
     <div class="visits" id="visitsText"></div>
-    <div class="reward" id="reward">🎉 العميل استحق مكافئة مجاني</div>
+    <div class="reward" id="reward">🎉 العميل استحق مشروب مجاني</div>
 </div>
 
 <script>
-function addVisit() {
+function addVisit(){
     const phone = document.getElementById("phone").value.trim();
-
-    if (!phone) {
+    if(!phone){
         alert("أدخل رقم الجوال");
         return;
     }
 
     let data = localStorage.getItem(phone);
+    data = data ? JSON.parse(data) : { visits: 0 };
 
-    if (!data) {
-        data = { visits: 0 };
-    } else {
-        data = JSON.parse(data);
-    }
-
-    data.visits += 1;
+    data.visits++;
 
     document.getElementById("visitsText").innerText =
         "عدد الزيارات: " + data.visits;
 
-    // إذا وصل 5 زيارات
-    if (data.visits >= 5) {
+    if(data.visits >= 5){
         document.getElementById("reward").style.display = "block";
 
-        // تحويل الرقم لصيغة دولية
         const whatsappNumber = phone.startsWith("0")
             ? "966" + phone.slice(1)
             : phone;
 
         const message =
 `🎉 مبروك!
-وصلت 5 زيارات 
+وصلت 5 زيارات في 
 مكافئتك القادم علينا 🎁`;
 
-        const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        window.open(url, "_blank");
+        window.open(
+          `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
+          "_blank"
+        );
 
-        data.visits = 0; // تصفير العداد بعد المكافأة
+        data.visits = 0;
     }
 
     localStorage.setItem(phone, JSON.stringify(data));
