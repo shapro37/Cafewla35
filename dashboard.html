@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة الموظف - الولاء</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2b1d14;
+            color: #f5e9dc;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #e6c89a;
+        }
+
+        .box {
+            background-color: #3a261a;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 400px;
+            margin: auto;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+        }
+
+        input {
+            background-color: #f5e9dc;
+        }
+
+        button {
+            background-color: #8b5e34;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #a06a3b;
+        }
+
+        .visits {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .reward {
+            margin-top: 15px;
+            background-color: #e6c89a;
+            color: #2b1d14;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<script>
+/* ===== كلمة سر لوحة الموظف ===== */
+const PASSWORD = "jazal2025"; // ← غيّر كلمة السر هنا
+
+const entered = prompt("أدخل كلمة مرور الموظف:");
+
+if (entered !== PASSWORD) {
+    alert("كلمة المرور غير صحيحة");
+    window.location.href = "index.html";
+}
+</script>
+
+<h1>☕ لوحة الموظف – الولاء</h1>
+
+<div class="box">
+    <input type="text" id="phone" placeholder="رقم جوال العميل">
+    <button onclick="addVisit()">إضافة زيارة</button>
+
+    <div class="visits" id="visitsText"></div>
+    <div class="reward" id="reward">🎉 العميل استحق مكافئة مجاني</div>
+</div>
+
+<script>
+function addVisit() {
+    const phone = document.getElementById("phone").value.trim();
+
+    if (!phone) {
+        alert("أدخل رقم الجوال");
+        return;
+    }
+
+    let data = localStorage.getItem(phone);
+
+    if (!data) {
+        data = { visits: 0 };
+    } else {
+        data = JSON.parse(data);
+    }
+
+    data.visits += 1;
+
+    document.getElementById("visitsText").innerText =
+        "عدد الزيارات: " + data.visits;
+
+    // إذا وصل 5 زيارات
+    if (data.visits >= 5) {
+        document.getElementById("reward").style.display = "block";
+
+        // تحويل الرقم لصيغة دولية
+        const whatsappNumber = phone.startsWith("0")
+            ? "966" + phone.slice(1)
+            : phone;
+
+        const message =
+`🎉 مبروك!
+وصلت 5 زيارات 
+مكافئتك القادم علينا 🎁`;
+
+        const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+
+        data.visits = 0; // تصفير العداد بعد المكافأة
+    }
+
+    localStorage.setItem(phone, JSON.stringify(data));
+}
+</script>
+
+</body>
+</html>
